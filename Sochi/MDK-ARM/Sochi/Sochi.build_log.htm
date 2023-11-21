@@ -1,0 +1,73 @@
+<html>
+<body>
+<pre>
+<h1>µVision Build Log</h1>
+<h2>Tool Versions:</h2>
+IDE-Version: µVision V5.33.0.0
+Copyright (C) 2020 ARM Ltd and ARM Germany GmbH. All rights reserved.
+License Information: ivn HP, HP Inc., LIC=NQQMA-1YBTS-2ZRW4-FPCRJ-X5RI4-MGTSX
+ 
+Tool Versions:
+Toolchain:       MDK-ARM Plus  Version: 5.33.0.0
+Toolchain Path:  C:\Keil_v5\ARM\ARMCC\Bin
+C Compiler:      Armcc.exe V5.06 update 7 (build 960)
+Assembler:       Armasm.exe V5.06 update 7 (build 960)
+Linker/Locator:  ArmLink.exe V5.06 update 7 (build 960)
+Library Manager: ArmAr.exe V5.06 update 7 (build 960)
+Hex Converter:   FromElf.exe V5.06 update 7 (build 960)
+CPU DLL:         SARMCM3.DLL V5.33.0.0
+Dialog DLL:      DCM.DLL V1.17.3.0
+Target DLL:      STLink\ST-LINKIII-KEIL_SWO.dll V3.0.8.0
+Dialog DLL:      TCM.DLL V1.48.0.0
+ 
+<h2>Project:</h2>
+C:\STM32\Projects\RTC_Sochi\Sochi\MDK-ARM\Sochi.uvprojx
+Project File Date:  11/21/2023
+
+<h2>Output:</h2>
+*** Using Compiler 'V5.06 update 7 (build 960)', folder: 'C:\Keil_v5\ARM\ARMCC\Bin'
+Build target 'Sochi'
+assembling startup_stm32f411xe.s...
+compiling main.c...
+../Core/Inc/Func.h(5): warning:  #1295-D: Deprecated declaration r_motor_stop - give arg types
+  void r_motor_stop();
+../Core/Inc/Func.h(6): warning:  #1295-D: Deprecated declaration StartState - give arg types
+  void StartState();
+../Core/Inc/Func.h(7): warning:  #1295-D: Deprecated declaration Update - give arg types
+  void Update();
+../Core/Inc/Func.h(12): warning:  #1-D: last line of file ends without a newline
+  void ServoWrite5(uint16_t Angle);
+../Core/Inc/Encoder.h(1): warning:  #1-D: last line of file ends without a newline
+  #include "main.h"
+../Core/Src/main.c: 5 warnings, 0 errors
+linking...
+Program Size: Code=12006 RO-data=474 RW-data=56 ZI-data=2432  
+FromELF: creating hex file...
+"Sochi\Sochi.axf" - 0 Error(s), 5 Warning(s).
+
+<h2>Software Packages used:</h2>
+
+Package Vendor: ARM
+                http://www.keil.com/pack/ARM.CMSIS.5.7.0.pack
+                ARM.CMSIS.5.7.0
+                CMSIS (Cortex Microcontroller Software Interface Standard)
+   * Component: CORE Version: 5.4.0
+
+Package Vendor: Keil
+                http://www.keil.com/pack/Keil.STM32F4xx_DFP.2.15.0.pack
+                Keil.STM32F4xx_DFP.2.15.0
+                STMicroelectronics STM32F4 Series Device Support, Drivers and Examples
+
+<h2>Collection of Component include folders:</h2>
+  .\RTE\_Sochi
+  C:\Users\HP\AppData\Local\Arm\Packs\ARM\CMSIS\5.7.0\CMSIS\Core\Include
+  C:\Users\HP\AppData\Local\Arm\Packs\Keil\STM32F4xx_DFP\2.15.0\Drivers\CMSIS\Device\ST\STM32F4xx\Include
+
+<h2>Collection of Component Files used:</h2>
+
+   * Component: ARM::CMSIS:CORE:5.4.0
+      Include file:  CMSIS\Core\Include\tz_context.h
+Build Time Elapsed:  00:00:03
+</pre>
+</body>
+</html>
