@@ -34,3 +34,4 @@ sochi\main.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h
 sochi\main.o: ../Core/Inc/Func.h
 sochi\main.o: ../Core/Inc/Defines.h
 sochi\main.o: ../Core/Inc/Encoder.h
+sochi\main.o: ../Core/Inc/PidVel.h

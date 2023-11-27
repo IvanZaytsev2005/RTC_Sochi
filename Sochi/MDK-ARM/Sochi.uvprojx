@@ -404,6 +404,11 @@
               <FilePath>..\Core\Src\Encoder.c</FilePath>
             </File>
             <File>
+              <FileName>PidVel.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Core\Src\PidVel.c</FilePath>
+            </File>
+            <File>
               <FileName>main.c</FileName>
               <FileType>1</FileType>
               <FilePath>../Core/Src/main.c</FilePath>

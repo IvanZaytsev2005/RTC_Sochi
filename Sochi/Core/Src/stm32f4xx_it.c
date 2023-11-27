@@ -47,6 +47,8 @@ extern uint8_t flag;
 extern uint8_t CountIn;
 extern int32_t CountR;
 extern int32_t CountL;
+
+extern uint8_t CountSpace;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -62,6 +64,7 @@ extern int32_t CountL;
 /* External variables --------------------------------------------------------*/
 extern TIM_HandleTypeDef htim2;
 extern TIM_HandleTypeDef htim3;
+extern TIM_HandleTypeDef htim5;
 extern TIM_HandleTypeDef htim10;
 extern TIM_HandleTypeDef htim11;
 extern DMA_HandleTypeDef hdma_usart1_rx;
@@ -194,7 +197,24 @@ void PendSV_Handler(void)
 void SysTick_Handler(void)
 {
   /* USER CODE BEGIN SysTick_IRQn 0 */
-
+	static uint32_t Count;
+	if ((Count%50)==0)
+	{
+		flag|=(1<<TimeOk);
+	}
+	if((Count%100)==0)
+	{
+		flag|=(1<<StartCulcSpeed);
+	}
+	if((Count%PidTime)==0)
+	{
+		flag|=(1<<StartPidUpdate);
+	}
+	if((Count%500)==0)
+	{
+		HAL_GPIO_TogglePin(Led_GPIO_Port,Led_Pin);
+	}
+	Count++;
   /* USER CODE END SysTick_IRQn 0 */
   HAL_IncTick();
   /* USER CODE BEGIN SysTick_IRQn 1 */
@@ -279,12 +299,21 @@ void USART1_IRQHandler(void)
 {
   /* USER CODE BEGIN USART1_IRQn 0 */
 	static uint8_t CountUart6;
+	static uint8_t CountSpaceUart;
 	RxBuf[CountUart6]=(USART1->DR);//&(~(0x30));
 	CountUart6++;
-	if (RxBuf[CountUart6-1]=='_')
+	
+	if((RxBuf[CountUart6-1])==' ')
+	{
+		CountSpaceUart=CountSpaceUart+1;
+	}
+	
+	if ((RxBuf[CountUart6-1]=='_')|(RxBuf[CountUart6-1]=='\r'))
 	{
 		CountIn=CountUart6;
 		CountUart6=0;
+		CountSpace=CountSpaceUart;
+		CountSpaceUart=0;
 		flag|=(1<<RecieveOk);
 	}
   /* USER CODE END USART1_IRQn 0 */
@@ -292,6 +321,20 @@ void USART1_IRQHandler(void)
   /* USER CODE BEGIN USART1_IRQn 1 */
 
   /* USER CODE END USART1_IRQn 1 */
+}
+
+/**
+  * @brief This function handles TIM5 global interrupt.
+  */
+void TIM5_IRQHandler(void)
+{
+  /* USER CODE BEGIN TIM5_IRQn 0 */
+
+  /* USER CODE END TIM5_IRQn 0 */
+  HAL_TIM_IRQHandler(&htim5);
+  /* USER CODE BEGIN TIM5_IRQn 1 */
+
+  /* USER CODE END TIM5_IRQn 1 */
 }
 
 /**

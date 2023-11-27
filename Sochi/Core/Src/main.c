@@ -24,6 +24,7 @@
 #include "Func.h"
 #include "Defines.h"
 #include "Encoder.h"
+#include "PidVel.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -56,7 +57,8 @@ DMA_HandleTypeDef hdma_usart1_tx;
 
 /* USER CODE BEGIN PV */
 
-uint8_t RxBuf[32];
+uint8_t RxBuf [32];
+uint8_t TxBuf[50];
 uint8_t flag;
 uint8_t CountIn;
 int32_t CountR;
@@ -65,8 +67,30 @@ int32_t CountL;
 uint32_t Time1;
 uint32_t Time2;
 
+int32_t SpeedTickR;
+int32_t SpeedTickL;
+
+
 float length1;
 float length2;
+uint16_t SmaBufT1[SmaN];
+uint16_t SmaBufT2[SmaN];
+uint8_t CountPosL1;
+uint8_t CountPosL2;
+
+/* PID Parameters */
+uint16_t Kp;
+uint16_t Kd;
+uint16_t Ki;
+uint16_t Ko;
+
+uint8_t moving;
+
+SetPointInfo leftPID, rightPID;
+
+uint8_t CountSpace;
+
+uint16_t ServoDeg[5];
 
 /* USER CODE END PV */
 
@@ -137,7 +161,6 @@ int main(void)
   /* USER CODE BEGIN 2 */
 	//Start motor1
 	StartState();
-	
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -149,6 +172,24 @@ int main(void)
 			Update();
 			//UpdateMx();
 			flag&=~(1<<RecieveOk);
+		}
+		if ((flag&(1<<TimeOk))!=0)
+		{
+			//ServoWrite3((uint16_t)length2);
+/*			uint16_t S=OutPlot(length1, length2, CountR, TxBuf);
+			HAL_UART_Transmit(&h  uart1,TxBuf,S,1000);
+			flag&=~(1<<TimeOk);*/
+		}
+		if((flag&(1<<StartCulcSpeed))!=0)
+		{
+			SpeedCulcTick();
+			flag&=~(1<<StartCulcSpeed);
+		}
+		
+		if((flag&(1<<StartPidUpdate)))
+		{
+			updatePID();
+			flag&=~(1<<StartPidUpdate);
 		}
     /* USER CODE END WHILE */
 
@@ -238,7 +279,7 @@ static void MX_TIM2_Init(void)
   htim2.Init.Period = 4294967295;
   htim2.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim2.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
-  sConfig.EncoderMode = TIM_ENCODERMODE_TI12;
+  sConfig.EncoderMode = TIM_ENCODERMODE_TI2;
   sConfig.IC1Polarity = TIM_ICPOLARITY_RISING;
   sConfig.IC1Selection = TIM_ICSELECTION_DIRECTTI;
   sConfig.IC1Prescaler = TIM_ICPSC_DIV1;
@@ -285,7 +326,7 @@ static void MX_TIM3_Init(void)
   htim3.Instance = TIM3;
   htim3.Init.Prescaler = 32;
   htim3.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim3.Init.Period = 50000;
+  htim3.Init.Period = 20000;
   htim3.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim3.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
   if (HAL_TIM_Base_Init(&htim3) != HAL_OK)
@@ -424,7 +465,7 @@ static void MX_TIM5_Init(void)
   htim5.Init.Period = 4294967295;
   htim5.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim5.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
-  sConfig.EncoderMode = TIM_ENCODERMODE_TI1;
+  sConfig.EncoderMode = TIM_ENCODERMODE_TI2;
   sConfig.IC1Polarity = TIM_ICPOLARITY_RISING;
   sConfig.IC1Selection = TIM_ICSELECTION_DIRECTTI;
   sConfig.IC1Prescaler = TIM_ICPSC_DIV1;
@@ -469,7 +510,7 @@ static void MX_TIM9_Init(void)
   htim9.Instance = TIM9;
   htim9.Init.Prescaler = 256;
   htim9.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim9.Init.Period = 999;
+  htim9.Init.Period = 256;
   htim9.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim9.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
   if (HAL_TIM_PWM_Init(&htim9) != HAL_OK)
@@ -661,7 +702,7 @@ static void MX_GPIO_Init(void)
   HAL_GPIO_WritePin(Trig_GPIO_Port, Trig_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(Servo5_GPIO_Port, Servo5_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOB, EN_L_A_Pin|EN_L_B_Pin|Servo5_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pins : Led_Pin EN_R_A_Pin EN_R_B_Pin */
   GPIO_InitStruct.Pin = Led_Pin|EN_R_A_Pin|EN_R_B_Pin;
@@ -677,12 +718,12 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(Trig_GPIO_Port, &GPIO_InitStruct);
 
-  /*Configure GPIO pin : Servo5_Pin */
-  GPIO_InitStruct.Pin = Servo5_Pin;
+  /*Configure GPIO pins : EN_L_A_Pin EN_L_B_Pin Servo5_Pin */
+  GPIO_InitStruct.Pin = EN_L_A_Pin|EN_L_B_Pin|Servo5_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(Servo5_GPIO_Port, &GPIO_InitStruct);
+  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
 /* USER CODE BEGIN MX_GPIO_Init_2 */
 /* USER CODE END MX_GPIO_Init_2 */

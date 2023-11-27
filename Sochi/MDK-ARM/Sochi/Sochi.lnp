@@ -2,6 +2,7 @@
 "sochi\startup_stm32f411xe.o"
 "sochi\func.o"
 "sochi\encoder.o"
+"sochi\pidvel.o"
 "sochi\main.o"
 "sochi\stm32f4xx_it.o"
 "sochi\stm32f4xx_hal_msp.o"

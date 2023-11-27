@@ -1,5 +1,6 @@
 #include "Encoder.h"
-//#include "tim.h"
+#include "Func.h"
+#include "Defines.h"
 
 extern int32_t CountR;
 extern int32_t CountL;
@@ -8,6 +9,11 @@ extern uint32_t Time1;
 extern uint32_t Time2;
 extern float length1;
 extern float length2;
+
+extern uint16_t SmaBufT1[SmaN];
+extern uint16_t SmaBufT2[SmaN];
+extern uint8_t CountPosL1;
+extern uint8_t CountPosL2;
 
 void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
 {
@@ -25,6 +31,20 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
 			CountR =currCounter;
 		}
 	}
+	
+	if(htim->Instance==TIM5)
+	{
+		uint32_t currCounter = TIM5->CNT;
+		if (currCounter>0x80000000)
+		{
+			CountL=currCounter-0xFFFFFFFF;
+		}
+		else
+		{
+			CountL =currCounter;
+		}
+	}
+	
 	 if(htim->Instance == TIM3)
 		{
 			if(htim->Channel == HAL_TIM_ACTIVE_CHANNEL_3) // RISING ? LOW ?? HIGH
@@ -34,7 +54,8 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
       }
       else if(htim->Channel == HAL_TIM_ACTIVE_CHANNEL_4) // FALLING ? HIGH ?? LOW
 			{
-				Time2 = TIM3->CCR4-CCR3_Start; // 
+				uint16_t Temp=TIM3->CCR4-CCR3_Start;
+				Time2 = SMA(SmaBufT2,Temp,&CountPosL2); // 
 				length2=(float)Time2/58;
       }
 			

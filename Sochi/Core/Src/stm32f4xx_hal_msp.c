@@ -142,6 +142,9 @@ void HAL_TIM_Encoder_MspInit(TIM_HandleTypeDef* htim_encoder)
     GPIO_InitStruct.Alternate = GPIO_AF2_TIM5;
     HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
+    /* TIM5 interrupt Init */
+    HAL_NVIC_SetPriority(TIM5_IRQn, 0, 0);
+    HAL_NVIC_EnableIRQ(TIM5_IRQn);
   /* USER CODE BEGIN TIM5_MspInit 1 */
 
   /* USER CODE END TIM5_MspInit 1 */
@@ -273,9 +276,9 @@ void HAL_TIM_MspPostInit(TIM_HandleTypeDef* htim)
     PB9     ------> TIM4_CH4
     */
     GPIO_InitStruct.Pin = Servo1_Pin|Servo2_Pin|Servo4_Pin|Servo3_Pin;
-    GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+    GPIO_InitStruct.Mode = GPIO_MODE_AF_OD;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
-    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
     GPIO_InitStruct.Alternate = GPIO_AF2_TIM4;
     HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
@@ -351,6 +354,8 @@ void HAL_TIM_Encoder_MspDeInit(TIM_HandleTypeDef* htim_encoder)
     */
     HAL_GPIO_DeInit(GPIOA, Enc_L_A_Pin|Enc_L_B_Pin);
 
+    /* TIM5 interrupt DeInit */
+    HAL_NVIC_DisableIRQ(TIM5_IRQn);
   /* USER CODE BEGIN TIM5_MspDeInit 1 */
 
   /* USER CODE END TIM5_MspDeInit 1 */
