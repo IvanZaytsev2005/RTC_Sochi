@@ -3,6 +3,7 @@
 "sochi\func.o"
 "sochi\encoder.o"
 "sochi\pidvel.o"
+"sochi\pidpos.o"
 "sochi\main.o"
 "sochi\stm32f4xx_it.o"
 "sochi\stm32f4xx_hal_msp.o"
@@ -23,7 +24,7 @@
 "sochi\stm32f4xx_hal_exti.o"
 "sochi\stm32f4xx_hal_uart.o"
 "sochi\system_stm32f4xx.o"
---strict --scatter "Sochi\Sochi.sct"
+--library_type=microlib --strict --scatter "Sochi\Sochi.sct"
 --summary_stderr --info summarysizes --map --load_addr_map_info --xref --callgraph --symbols
 --info sizes --info totals --info unused --info veneers
 --list "Sochi.map" -o Sochi\Sochi.axf

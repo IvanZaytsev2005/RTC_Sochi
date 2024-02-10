@@ -22,7 +22,7 @@ Dialog DLL:      TCM.DLL V1.48.0.0
  
 <h2>Project:</h2>
 C:\STM32\Projects\RTC_Sochi\Sochi\MDK-ARM\Sochi.uvprojx
-Project File Date:  11/26/2023
+Project File Date:  02/10/2024
 
 <h2>Output:</h2>
 *** Using Compiler 'V5.06 update 7 (build 960)', folder: 'C:\Keil_v5\ARM\ARMCC\Bin'
@@ -38,53 +38,77 @@ compiling Func.c...
   void Update();
 ../Core/Inc/Func.h(20): warning:  #1295-D: Deprecated declaration SpeedCulcTick - give arg types
   void SpeedCulcTick();
-../Core/Inc/Func.h(22): warning:  #1295-D: Deprecated declaration TransmitOK - give arg types
+../Core/Inc/Func.h(23): warning:  #1295-D: Deprecated declaration TransmitOK - give arg types
   void TransmitOK();
-../Core/Inc/Func.h(23): warning:  #1-D: last line of file ends without a newline
+../Core/Inc/Func.h(24): warning:  #1-D: last line of file ends without a newline
   void setMotorSpeeds(int16_t VelL, int16_t VelR);
-../Core/Inc/Defines.h(22): warning:  #1-D: last line of file ends without a newline
-  #define MaxDegreeServo1 0
-../Core/Inc/PidVel.h(35): warning:  #1295-D: Deprecated declaration resetPID - give arg types
-  void resetPID();
-../Core/Inc/PidVel.h(37): warning:  #1295-D: Deprecated declaration updatePID - give arg types
-  void updatePID();
-..\Core\Src\Func.c(111): warning:  #188-D: enumerated type mixed with another type
+../Core/Inc/Defines.h(51): warning:  #1-D: last line of file ends without a newline
+  #endif
+../Core/Inc/Defines.h(51): warning:  #1-D: last line of file ends without a newline
+  #endif
+..\Core\Src\Func.c(130): warning:  #188-D: enumerated type mixed with another type
   	HAL_GPIO_WritePin(EN_R_A_GPIO_Port,EN_R_A_Pin,1);
-..\Core\Src\Func.c(112): warning:  #188-D: enumerated type mixed with another type
+..\Core\Src\Func.c(131): warning:  #188-D: enumerated type mixed with another type
   	HAL_GPIO_WritePin(EN_R_B_GPIO_Port,EN_R_B_Pin,0);
-..\Core\Src\Func.c(118): warning:  #188-D: enumerated type mixed with another type
+..\Core\Src\Func.c(137): warning:  #188-D: enumerated type mixed with another type
   	HAL_GPIO_WritePin(EN_R_A_GPIO_Port,EN_R_A_Pin,0);
-..\Core\Src\Func.c(119): warning:  #188-D: enumerated type mixed with another type
+..\Core\Src\Func.c(138): warning:  #188-D: enumerated type mixed with another type
   	HAL_GPIO_WritePin(EN_R_B_GPIO_Port,EN_R_B_Pin,1);
-..\Core\Src\Func.c(125): warning:  #188-D: enumerated type mixed with another type
+..\Core\Src\Func.c(144): warning:  #188-D: enumerated type mixed with another type
   	HAL_GPIO_WritePin(EN_R_A_GPIO_Port,EN_R_A_Pin,1);
-..\Core\Src\Func.c(126): warning:  #188-D: enumerated type mixed with another type
+..\Core\Src\Func.c(145): warning:  #188-D: enumerated type mixed with another type
   	HAL_GPIO_WritePin(EN_R_B_GPIO_Port,EN_R_B_Pin,1);
-..\Core\Src\Func.c(132): warning:  #188-D: enumerated type mixed with another type
+..\Core\Src\Func.c(151): warning:  #188-D: enumerated type mixed with another type
   	HAL_GPIO_WritePin(EN_L_A_GPIO_Port,EN_L_A_Pin,1);
-..\Core\Src\Func.c(133): warning:  #188-D: enumerated type mixed with another type
+..\Core\Src\Func.c(152): warning:  #188-D: enumerated type mixed with another type
   	HAL_GPIO_WritePin(EN_L_B_GPIO_Port,EN_L_B_Pin,0);
-..\Core\Src\Func.c(139): warning:  #188-D: enumerated type mixed with another type
+..\Core\Src\Func.c(158): warning:  #188-D: enumerated type mixed with another type
   	HAL_GPIO_WritePin(EN_L_A_GPIO_Port,EN_L_A_Pin,0);
-..\Core\Src\Func.c(140): warning:  #188-D: enumerated type mixed with another type
+..\Core\Src\Func.c(159): warning:  #188-D: enumerated type mixed with another type
   	HAL_GPIO_WritePin(EN_L_B_GPIO_Port,EN_L_B_Pin,1);
-..\Core\Src\Func.c(146): warning:  #188-D: enumerated type mixed with another type
+..\Core\Src\Func.c(165): warning:  #188-D: enumerated type mixed with another type
   	HAL_GPIO_WritePin(EN_L_A_GPIO_Port,EN_L_A_Pin,1);
-..\Core\Src\Func.c(147): warning:  #188-D: enumerated type mixed with another type
+..\Core\Src\Func.c(166): warning:  #188-D: enumerated type mixed with another type
   	HAL_GPIO_WritePin(EN_L_B_GPIO_Port,EN_L_B_Pin,1);
-..\Core\Src\Func.c(334): warning:  #223-D: function "sprintf" declared implicitly
+..\Core\Src\Func.c(376): warning:  #223-D: function "sprintf" declared implicitly
   			S=sprintf(TxBuf,"%d",ServoDeg[((uint32_t)(datal-1))]);
-..\Core\Src\Func.c(529): warning:  #223-D: function "sprintf" declared implicitly
+..\Core\Src\Func.c(454): warning:  #223-D: function "sprintf" declared implicitly
   	uint8_t S=sprintf(Buf,"%f",data1);
-..\Core\Src\Func.c(545): warning:  #223-D: function "sprintf" declared implicitly
+..\Core\Src\Func.c(470): warning:  #223-D: function "sprintf" declared implicitly
   	uint8_t S=sprintf(Buf,"%d",data1);
-..\Core\Src\Func.c(610): warning:  #1-D: last line of file ends without a newline
+..\Core\Src\Func.c(482): warning:  #223-D: function "sprintf" declared implicitly
+  	uint8_t S=sprintf(Buf,"%f",data1);
+..\Core\Src\Func.c(518): warning:  #223-D: function "abs" declared implicitly
+  	if((abs(VelL)>MinMotorPWM)|(abs(VelR)>MinMotorPWM))
+..\Core\Src\Func.c(552): warning:  #1-D: last line of file ends without a newline
   }
-..\Core\Src\Func.c: 26 warnings, 0 errors
+..\Core\Src\Func.c: 27 warnings, 0 errors
+compiling main.c...
+../Core/Inc/Func.h(6): warning:  #1295-D: Deprecated declaration r_motor_stop - give arg types
+  void r_motor_stop();
+../Core/Inc/Func.h(9): warning:  #1295-D: Deprecated declaration l_motor_stop - give arg types
+  void l_motor_stop();
+../Core/Inc/Func.h(10): warning:  #1295-D: Deprecated declaration StartState - give arg types
+  void StartState();
+../Core/Inc/Func.h(11): warning:  #1295-D: Deprecated declaration Update - give arg types
+  void Update();
+../Core/Inc/Func.h(20): warning:  #1295-D: Deprecated declaration SpeedCulcTick - give arg types
+  void SpeedCulcTick();
+../Core/Inc/Func.h(23): warning:  #1295-D: Deprecated declaration TransmitOK - give arg types
+  void TransmitOK();
+../Core/Inc/Func.h(24): warning:  #1-D: last line of file ends without a newline
+  void setMotorSpeeds(int16_t VelL, int16_t VelR);
+../Core/Inc/Defines.h(51): warning:  #1-D: last line of file ends without a newline
+  #endif
+../Core/Inc/Encoder.h(1): warning:  #1-D: last line of file ends without a newline
+  #include "main.h"
+../Core/Inc/Defines.h(51): warning:  #1-D: last line of file ends without a newline
+  #endif
+../Core/Src/main.c: 10 warnings, 0 errors
 linking...
-Program Size: Code=14454 RO-data=474 RW-data=88 ZI-data=2560  
+Program Size: Code=20380 RO-data=472 RW-data=172 ZI-data=2180  
 FromELF: creating hex file...
-"Sochi\Sochi.axf" - 0 Error(s), 26 Warning(s).
+"Sochi\Sochi.axf" - 0 Error(s), 37 Warning(s).
 
 <h2>Software Packages used:</h2>
 
@@ -107,8 +131,7 @@ Package Vendor: Keil
 <h2>Collection of Component Files used:</h2>
 
    * Component: ARM::CMSIS:CORE:5.4.0
-      Include file:  CMSIS\Core\Include\tz_context.h
-Build Time Elapsed:  00:00:05
+Build Time Elapsed:  00:00:08
 </pre>
 </body>
 </html>

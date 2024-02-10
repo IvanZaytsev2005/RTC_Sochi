@@ -35,3 +35,4 @@ sochi\main.o: ../Core/Inc/Func.h
 sochi\main.o: ../Core/Inc/Defines.h
 sochi\main.o: ../Core/Inc/Encoder.h
 sochi\main.o: ../Core/Inc/PidVel.h
+sochi\main.o: ../Core/Inc/Defines.h

@@ -10,6 +10,9 @@ extern uint32_t Time2;
 extern float length1;
 extern float length2;
 
+extern float DistLeftM;
+extern float DistRightM;
+
 extern uint16_t SmaBufT1[SmaN];
 extern uint16_t SmaBufT2[SmaN];
 extern uint8_t CountPosL1;
@@ -45,7 +48,10 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
 		}
 	}
 	
-	 if(htim->Instance == TIM3)
+	DistLeftM=(float)CountL/TickPerMetrLeft;
+	DistRightM=(float)CountR/TickPerMetrRight;
+	
+	/* if(htim->Instance == TIM3)
 		{
 			if(htim->Channel == HAL_TIM_ACTIVE_CHANNEL_3) // RISING ? LOW ?? HIGH
 			{
@@ -69,6 +75,6 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
 				Time1 = TIM3->CCR2-CCR1_Start; // 
 				length1=(float)Time1/58;
       }
-    }
+    }*/
 	
 }

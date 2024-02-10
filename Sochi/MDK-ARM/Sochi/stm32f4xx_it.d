@@ -33,3 +33,5 @@ sochi\stm32f4xx_it.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim_ex.h
 sochi\stm32f4xx_it.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h
 sochi\stm32f4xx_it.o: ../Core/Inc/stm32f4xx_it.h
 sochi\stm32f4xx_it.o: ../Core/Inc/Defines.h
+sochi\stm32f4xx_it.o: ../Core/Inc/Func.h
+sochi\stm32f4xx_it.o: ../Core/Inc/PidPos.h

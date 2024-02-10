@@ -23,14 +23,27 @@ extern uint8_t TxBuf[50];
 extern int32_t SpeedTickR;
 extern int32_t SpeedTickL;
 
-extern uint16_t Kp;
-extern uint16_t Kd;
-extern uint16_t Ki;
+extern float DistLeftM;
+extern float DistRightM;
+extern float SpeedLeftMS;
+extern float SpeedRightMS;
+
+extern float SpeedLeftMS;
+extern float SpeedRightMS;
+
+extern float TargetSpeedLeftMS;
+extern float TargetSpeedRightMS;
+
+extern float Kp;
+extern float Kd;
+extern float Ki;
 extern uint16_t Ko;
 
-extern uint8_t moving;
+#ifdef PidVelArduino
 
+extern uint8_t moving;
 extern SetPointInfo leftPID, rightPID;
+#endif
 
 int32_t LastCountR;
 int32_t LastCountL;
@@ -38,6 +51,12 @@ int32_t LastCountL;
 extern uint8_t CountSpace;
 
 extern uint16_t ServoDeg[5];
+
+extern uint32_t Servo5AngleRaw;
+
+#ifdef SettingMan
+extern	uint32_t CountTest;
+#endif
 
 void StartState()
 {
@@ -95,14 +114,14 @@ void StartState()
 	ServoDeg[2]=ZeroStateServo3;
 	ServoDeg[3]=ZeroStateServo4;
 	ServoDeg[4]=ZeroStateServo5;
+	#ifdef PidVel
+	Kp = 1200;
+	Kd = 500;
+	Ki = 300;
 	
-	Kp = 50;
-	Kd = 82;
-	Ki = 0;
-	Ko = 50;
-	
-	moving=0;
-
+	TargetSpeedRightMS=0.05;
+	TargetSpeedRightMS=0;
+	#endif
 }
 
 void r_motor_forv(uint16_t Velocity)
@@ -270,11 +289,19 @@ void Update()
 	switch(RxBuf[0])
 	{
 		case 'O':
-			setMotorSpeeds(datal, datar);
+			setMotorSpeeds(datar, datal);
 			TransmitOK();
 		break;
 		case 'E'://get encoders
-			S=OutEnc(CountR, CountL, TxBuf);
+			S=OutEnc(CountL, CountR, TxBuf);
+			HAL_UART_Transmit_DMA(&huart1,TxBuf,S);
+		break;
+		case 'D':
+			S=OutDistance(DistLeftM,DistRightM,TxBuf);
+			HAL_UART_Transmit_DMA(&huart1,TxBuf,S);
+		break;
+		case 'V':
+			S=OutDistance(SpeedLeftMS,SpeedRightMS,TxBuf);
 			HAL_UART_Transmit_DMA(&huart1,TxBuf,S);
 		break;
 		case 'R':// reset encoders
@@ -284,27 +311,29 @@ void Update()
 			CountL=0;
 			TransmitOK();
 		break;
+		#ifdef PidVel
 		case 'M':
-			if (datal == 0 && datar == 0) 
-			{
-				setMotorSpeeds(0, 0);
-				resetPID();
-				moving = 0;
-			}
-			else moving = 1;
-			leftPID.TargetTicksPerFrame = datal;
-			rightPID.TargetTicksPerFrame = datar;
+			TargetSpeedLeftMS = (float)datal/1000;
+			TargetSpeedRightMS = (float)datar/1000;
 			TransmitOK();
 		break;
-		case 'P':
+		case 'L':
+			TargetSpeedLeftMS = 0.1;
+			TargetSpeedRightMS = 0.1;
+			Servo5AngleRaw=datal;
+			flag|=(1<<StartMovServo5);
+			TransmitOK();
+		break;
+		#endif
+		case 'p':
 			Kp=datal;
 			TransmitOK();
 		break;
-		case 'I':
+		case 'i':
 			Ki=datal;
 			TransmitOK();
 		break;
-		case 'D':
+		case 'd':
 			Kd=datal;
 			TransmitOK();
 		break;
@@ -324,7 +353,20 @@ void Update()
 					ServoWrite4(datar);
 				break;
 				case 5:
-					ServoWrite5(datar);
+					//ServoWrite5(datar);
+					if(datar>0)
+					{
+						Servo5AngleRaw=datar*200/9;
+						flag|=(1<<StartMovServo5);
+						TIM4->CCR4=SpeedServo5Right;
+					}
+					else
+					{
+						Servo5AngleRaw=(uint32_t)((-1)*datar)*200/9;
+						flag|=(1<<StartMovServo5);
+						TIM4->CCR4=SpeedServo5Left;
+					}
+					
 				break;
 			}				
 			ServoDeg[datal-1]=(uint16_t)(datar);
@@ -335,151 +377,34 @@ void Update()
 		TxBuf[S]='\r';
 			HAL_UART_Transmit_DMA(&huart1,TxBuf,S+1);
 		break;
+		#ifdef SettingMan
+		case 'J':
+			switch(datal)
+			{
+				case 0:
+					S=sprintf(TxBuf,"%d",CountTest);
+					flag&=~(1<<StartSettingMan);
+				case 1:
+					flag|=(1<<StartMovServo5);
+					Servo5AngleRaw=Servo5TestAngleRaw;
+					TIM4->CCR4=datar;
+					TransmitOK();
+				break;
+				case 2:
+					flag|=(1<<StartMovServo5);
+					Servo5AngleRaw=Servo5TestAngleRaw;
+					TIM4->CCR4=datar;
+					TransmitOK();
+				break;
+			}
+			
+		break;
+		
+		#endif
 				
 	}
 	
-/*	switch (RxBuf[0])
-	{
-		case 'P':// motor raw PWM
-			if((data<MIN_PWM)&(data>((-1)*MIN_PWM)))
-			{
-				data=0;
-			}
-			switch (RxBuf[1])
-			{
-				case 'R':
-					if (data>=0)
-					{
-						r_motor_forv(data);
-					}
-					else
-					{
-						if(data==0)
-						{
-							r_motor_stop();
-						}
-						r_motor_back(abs(data));
-					}
-					break;
-				case 'L':
-					if (data>=0)
-					{
-						l_motor_forv(data);
-					}
-					else
-					{
-						if(data==0)
-						{
-							l_motor_stop();
-						}
-						l_motor_back(abs(data));
-					}
-					break;
-			}
-		TransmitOK();
-		break;
-		case 'A':
-			switch (RxBuf[1])
-			{
-				case '1':
-						ServoWrite1((uint16_t)data);
-				break;
-				case '2':
-						ServoWrite2((uint16_t)data);
-				break;
-				case '3':
-						ServoWrite3((uint16_t)data);
-				break;
-				case '4':
-						ServoWrite4((uint16_t)data);
-				break;
-				case '5':
-						ServoWrite5((uint16_t)data);
-				break;
-			}
-			break;
-		case 'S':
-			switch (RxBuf[1])
-			{
-				case '1':
-						TIM4->CCR1=data;
-				break;
-				case '2':
-						TIM4->CCR2=data;
-				break;
-				case '3':
-						TIM4->CCR3=data;
-				break;
-				
-				case '4':
-						TIM4->CCR4=data;
-				break;
-				case '5':
-						TIM11->CCR1=data;
-				break;
-			}
-			break;
-		case 'e'://get encoders
-			S=OutEnc(CountR, CountL, TxBuf);
-			HAL_UART_Transmit_DMA(&huart1,TxBuf,S);
-		break;
-		case 'r':// reset encoders
-			TIM2->CNT=0;
-			TIM5->CNT=0;
-			CountR=0;
-			CountL=0;
-			TransmitOK();
-		case 'm':// motor speed with PID
-			switch(RxBuf[1])
-			{
-				case 'l':
-						if(data==0)
-						{
-							movingl=0;
-							l_motor_stop();
-							resetPID();
-						}
-						else
-						{
-							movingl=1;
-							leftPID.TargetTicksPerFrame = data;
-						}
-					break;
-				case 'r':
-					if(data==0)
-						{
-							movingr=0;
-							r_motor_stop();
-							resetPID();
-						}
-						else
-						{
-							movingl=1;
-							rightPID.TargetTicksPerFrame = data;
-						}
-					break;
-			}
-			TransmitOK();
-			break;
-		
-		case 'u':
-			switch(RxBuf[1])
-			{
-				case 'P':
-					Kp=data;
-				break;
-				case 'I':
-					Ki=data;
-				break;
-				case 'D':
-					Kd=data;
-				break;
-			}
-		break;
-				
-		
-		
-	}*/
+
 	
 }
 
@@ -522,7 +447,7 @@ uint16_t SMA(uint16_t *data, uint16_t New, uint8_t *CountPos)
 	}
 }
 
-uint16_t OutPlot(float data1, float data2,int32_t data3, uint8_t *Buf)
+uint16_t OutPlot(float data1, float data2, uint8_t *Buf)
 {
 	*Buf='$';
 	Buf++;
@@ -532,12 +457,12 @@ uint16_t OutPlot(float data1, float data2,int32_t data3, uint8_t *Buf)
 	Buf++;
 	uint8_t D=sprintf(Buf,"%f",data2);
 	Buf=Buf+D;
-	*Buf=' ';
+/*	*Buf=' ';
 	Buf++;
 	uint8_t F=sprintf(Buf,"%d",data3);
-	Buf=Buf+F;
+	Buf=Buf+F;*/
 	*Buf=';';
-	return(4+S+D+F);
+	return(4+S+D);//+F);
 }
 
 uint16_t OutEnc(int32_t data1, int32_t data2, uint8_t *Buf)
@@ -552,12 +477,26 @@ uint16_t OutEnc(int32_t data1, int32_t data2, uint8_t *Buf)
 	return(2+S+D);
 }
 
+uint16_t OutDistance(float data1, float data2, uint8_t *Buf)
+{
+	uint8_t S=sprintf(Buf,"%f",data1);
+	Buf=Buf+S;
+	*Buf=' ';
+	Buf++;
+	uint8_t D=sprintf(Buf,"%f",data2);
+	Buf=Buf+D;
+	*Buf='\r';
+	return(2+S+D);
+}
+
 void SpeedCulcTick()
 {
-	SpeedTickR=CountR-LastCountR;
-	SpeedTickL=CountL-LastCountL;
-	LastCountR=CountR;
-	LastCountL=CountL;
+	static float DistLeftMLast;
+	static float DistRightMLast;
+	SpeedLeftMS=(DistLeftM-DistLeftMLast)*50;
+	SpeedRightMS=(DistRightM-DistRightMLast)*50;
+	DistLeftMLast=DistLeftM;
+	DistRightMLast=DistRightM;
 	
 }
 
@@ -576,35 +515,38 @@ void TransmitOK()
 
 void setMotorSpeeds(int16_t VelL, int16_t VelR)
 {
-	if(VelL>0)
+	if((abs(VelL)>MinMotorPWM)|(abs(VelR)>MinMotorPWM))
 	{
-		l_motor_forv(VelL);
-	}
-	else
-	{
-		if(VelL==0)
+		if(VelL>0)
 		{
-			l_motor_stop();
+			l_motor_forv(VelL);
 		}
 		else
 		{
-			l_motor_back((uint16_t)((-1)*VelL));
+			if(VelL==0)
+			{
+				l_motor_stop();
+			}
+			else
+			{
+				l_motor_back((uint16_t)((-1)*VelL));
+			}
 		}
-	}
-	
-	if(VelR>0)
-	{
-		r_motor_forv(VelR);
-	}
-	else
-	{
-		if(VelR==0)
+		
+		if(VelR>0)
 		{
-			r_motor_stop();
+			r_motor_forv(VelR);
 		}
 		else
 		{
-			r_motor_back((uint16_t)((-1)*VelR));
+			if(VelR==0)
+			{
+				r_motor_stop();
+			}
+			else
+			{
+				r_motor_back((uint16_t)((-1)*VelR));
+			}
 		}
 	}
 }

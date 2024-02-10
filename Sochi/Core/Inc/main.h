@@ -75,12 +75,8 @@ void Error_Handler(void);
 #define Motor2_PWM_GPIO_Port GPIOA
 #define Enc_R_A_Pin GPIO_PIN_5
 #define Enc_R_A_GPIO_Port GPIOA
-#define Echo1_Pin GPIO_PIN_6
-#define Echo1_GPIO_Port GPIOA
 #define Trig_Pin GPIO_PIN_7
 #define Trig_GPIO_Port GPIOA
-#define Echo2_Pin GPIO_PIN_0
-#define Echo2_GPIO_Port GPIOB
 #define EN_L_A_Pin GPIO_PIN_12
 #define EN_L_A_GPIO_Port GPIOB
 #define EN_L_B_Pin GPIO_PIN_13

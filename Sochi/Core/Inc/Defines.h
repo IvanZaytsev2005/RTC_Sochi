@@ -8,10 +8,13 @@
 #define TimeOk 1
 #define StartCulcSpeed 2
 #define StartPidUpdate 3
+#define StartSettingMan 4
+#define StartMovServo5 5
+#define FinishMovServo5 6
 
 #define SmaN 10
 
-#define PidTime 100
+
 
 #define ZeroStateServo1 125
 #define ZeroStateServo2 180
@@ -20,3 +23,29 @@
 #define ZeroStateServo5 93
 
 #define MaxDegreeServo1 0
+
+#define MinMotorPWM 100
+
+#define SpeedServo5Right 1390
+#define SpeedServo5Left 1480
+#define SpeedServo5Stop 0
+
+#define Servo5TestAngleRaw 1000//ms
+
+#define TickPerMetrLeft 3745
+#define TickPerMetrRight 4060
+
+#define SettingMan 1
+
+#define PidVel 1
+//#define PidPos 1
+
+#ifdef PidVel
+	#define PidTimeMs 50
+#endif
+
+
+#ifdef PidPos
+	#define PidTimeMs 100
+	#define NormDeltaMM 5 //error no moving
+#endif

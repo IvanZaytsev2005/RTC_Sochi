@@ -23,6 +23,8 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "Defines.h"
+#include "Func.h"
+#include "PidPos.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -48,6 +50,18 @@ extern uint8_t CountIn;
 extern int32_t CountR;
 extern int32_t CountL;
 
+extern float DistLeftM;
+extern float DistRightM;
+extern float SpeedLeftMS;
+extern float SpeedRightMS;
+
+extern uint32_t Servo5AngleRaw;
+extern PID PID1;
+
+#ifdef SettingMan
+extern	uint32_t CountTest;
+#endif
+
 extern uint8_t CountSpace;
 /* USER CODE END PV */
 
@@ -63,13 +77,15 @@ extern uint8_t CountSpace;
 
 /* External variables --------------------------------------------------------*/
 extern TIM_HandleTypeDef htim2;
-extern TIM_HandleTypeDef htim3;
 extern TIM_HandleTypeDef htim5;
 extern TIM_HandleTypeDef htim10;
 extern TIM_HandleTypeDef htim11;
 extern DMA_HandleTypeDef hdma_usart1_rx;
 extern DMA_HandleTypeDef hdma_usart1_tx;
+extern DMA_HandleTypeDef hdma_usart6_tx;
+extern DMA_HandleTypeDef hdma_usart6_rx;
 extern UART_HandleTypeDef huart1;
+extern UART_HandleTypeDef huart6;
 /* USER CODE BEGIN EV */
 
 /* USER CODE END EV */
@@ -198,15 +214,18 @@ void SysTick_Handler(void)
 {
   /* USER CODE BEGIN SysTick_IRQn 0 */
 	static uint32_t Count;
+	static uint32_t CountServo5;
+	
+	
 	if ((Count%50)==0)
 	{
 		flag|=(1<<TimeOk);
 	}
-	if((Count%100)==0)
+	if((Count%20)==0)
 	{
 		flag|=(1<<StartCulcSpeed);
 	}
-	if((Count%PidTime)==0)
+	if((Count%PidTimeMs)==0)
 	{
 		flag|=(1<<StartPidUpdate);
 	}
@@ -215,6 +234,34 @@ void SysTick_Handler(void)
 		HAL_GPIO_TogglePin(Led_GPIO_Port,Led_Pin);
 	}
 	Count++;
+	
+	if((flag&(1<<StartMovServo5))!=0)
+	{
+		if(CountServo5>=Servo5AngleRaw)
+		{
+			flag&=~(1<<StartMovServo5);
+			flag|=(1<<FinishMovServo5);
+			CountServo5=0;
+		}
+		else
+		{
+			CountServo5++;
+		}
+	}
+	
+	
+	if(Count==(30000-1))
+	{
+		Count=0;
+	}
+	
+	
+	#ifdef SettingMan
+		if((flag&(1<<StartSettingMan))!=0)
+		{
+			CountTest++;
+		}
+	#endif
   /* USER CODE END SysTick_IRQn 0 */
   HAL_IncTick();
   /* USER CODE BEGIN SysTick_IRQn 1 */
@@ -279,20 +326,6 @@ void TIM2_IRQHandler(void)
 }
 
 /**
-  * @brief This function handles TIM3 global interrupt.
-  */
-void TIM3_IRQHandler(void)
-{
-  /* USER CODE BEGIN TIM3_IRQn 0 */
-
-  /* USER CODE END TIM3_IRQn 0 */
-  HAL_TIM_IRQHandler(&htim3);
-  /* USER CODE BEGIN TIM3_IRQn 1 */
-
-  /* USER CODE END TIM3_IRQn 1 */
-}
-
-/**
   * @brief This function handles USART1 global interrupt.
   */
 void USART1_IRQHandler(void)
@@ -338,6 +371,20 @@ void TIM5_IRQHandler(void)
 }
 
 /**
+  * @brief This function handles DMA2 stream1 global interrupt.
+  */
+void DMA2_Stream1_IRQHandler(void)
+{
+  /* USER CODE BEGIN DMA2_Stream1_IRQn 0 */
+
+  /* USER CODE END DMA2_Stream1_IRQn 0 */
+  HAL_DMA_IRQHandler(&hdma_usart6_rx);
+  /* USER CODE BEGIN DMA2_Stream1_IRQn 1 */
+
+  /* USER CODE END DMA2_Stream1_IRQn 1 */
+}
+
+/**
   * @brief This function handles DMA2 stream2 global interrupt.
   */
 void DMA2_Stream2_IRQHandler(void)
@@ -352,6 +399,20 @@ void DMA2_Stream2_IRQHandler(void)
 }
 
 /**
+  * @brief This function handles DMA2 stream6 global interrupt.
+  */
+void DMA2_Stream6_IRQHandler(void)
+{
+  /* USER CODE BEGIN DMA2_Stream6_IRQn 0 */
+
+  /* USER CODE END DMA2_Stream6_IRQn 0 */
+  HAL_DMA_IRQHandler(&hdma_usart6_tx);
+  /* USER CODE BEGIN DMA2_Stream6_IRQn 1 */
+
+  /* USER CODE END DMA2_Stream6_IRQn 1 */
+}
+
+/**
   * @brief This function handles DMA2 stream7 global interrupt.
   */
 void DMA2_Stream7_IRQHandler(void)
@@ -363,6 +424,20 @@ void DMA2_Stream7_IRQHandler(void)
   /* USER CODE BEGIN DMA2_Stream7_IRQn 1 */
 
   /* USER CODE END DMA2_Stream7_IRQn 1 */
+}
+
+/**
+  * @brief This function handles USART6 global interrupt.
+  */
+void USART6_IRQHandler(void)
+{
+  /* USER CODE BEGIN USART6_IRQn 0 */
+
+  /* USER CODE END USART6_IRQn 0 */
+  HAL_UART_IRQHandler(&huart6);
+  /* USER CODE BEGIN USART6_IRQn 1 */
+
+  /* USER CODE END USART6_IRQn 1 */
 }
 
 /* USER CODE BEGIN 1 */

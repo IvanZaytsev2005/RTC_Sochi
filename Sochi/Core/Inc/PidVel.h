@@ -1,8 +1,7 @@
 #include "main.h"
-//#include "Defines.h"
+#include "Defines.h"
 
-
-
+#ifdef PidVelArduino
 
 /* PID setpoint info For a Motor */
 typedef struct 
@@ -35,3 +34,9 @@ SetPointInfo;
 void resetPID();
 void doPID(SetPointInfo *p);
 void updatePID();
+#endif
+
+#ifdef PidVel
+	int16_t UpdatePIDLeft(float TargetSpeed, float CurrentSpeed);
+	int16_t UpdatePIDRight(float TargetSpeed, float CurrentSpeed);
+#endif

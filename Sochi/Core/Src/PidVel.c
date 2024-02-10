@@ -2,11 +2,13 @@
 #include "Func.h"
 #include "Defines.h"
 
+extern float Kp;
+extern float Kd;
+extern float Ki;
+//extern uint16_t Ko;
 
-extern uint16_t Kp;
-extern uint16_t Kd;
-extern uint16_t Ki;
-extern uint16_t Ko;
+#ifdef PidVelArduino
+
 
 extern uint8_t moving;
 
@@ -101,3 +103,81 @@ void updatePID()
 	
 	
 }
+#endif
+
+#ifdef PidVel
+int16_t UpdatePIDLeft(float TargetSpeed, float CurrentSpeed)
+{
+	float e;//cur error e(t)
+	static float Last_e;//last error e(t-1)
+	
+	double P;
+	double D;
+	double I;
+	static double Last_I;
+	
+	static int16_t last_u;
+	int16_t u;
+	
+	e=TargetSpeed-CurrentSpeed;	
+//	if(abs(e)<0.001)
+//	{
+//		e=0;
+//	}
+	P=Kp*e;
+	I=Last_I+Ki*e;
+	D=Kd*(e-Last_e);
+	
+	u=(P+I+D);//+last_u);
+	
+	//last_u=u;
+	Last_e=e;
+	Last_I=I;
+	
+	if((u<10)&(u>-10))
+	{
+		u=0;
+	}
+	
+	return(u);
+}
+
+int16_t UpdatePIDRight(float TargetSpeed, float CurrentSpeed)
+{
+	float e;//cur error e(t)
+	static float Last_e;//last error e(t-1)
+	
+	double P;
+	double D;
+	double I;
+	static double Last_I;
+	
+	static int16_t last_u;
+	int16_t u;
+	
+	e=TargetSpeed-CurrentSpeed;	
+	
+//	if(abs(e)<0.001)
+//	{
+//		e=0;
+//	}
+	
+	P=Kp*e;
+	I=Last_I+Ki*e;
+	D=Kd*(e-Last_e);
+	
+	u=(P+I+D);//+last_u);
+	
+	last_u=u;
+	Last_e=e;
+	Last_I=I;
+	
+//	if(abs(u)<200)
+//	{
+//		u=0;
+//	}
+	
+	return(u);
+}
+
+#endif 
