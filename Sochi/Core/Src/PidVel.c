@@ -120,10 +120,10 @@ int16_t UpdatePIDLeft(float TargetSpeed, float CurrentSpeed)
 	int16_t u;
 	
 	e=TargetSpeed-CurrentSpeed;	
-//	if(abs(e)<0.001)
-//	{
-//		e=0;
-//	}
+	/*if(-0.00001<e<0.00001)
+	{
+		e=0;
+	}*/
 	P=Kp*e;
 	I=Last_I+Ki*e;
 	D=Kd*(e-Last_e);
@@ -157,10 +157,10 @@ int16_t UpdatePIDRight(float TargetSpeed, float CurrentSpeed)
 	
 	e=TargetSpeed-CurrentSpeed;	
 	
-//	if(abs(e)<0.001)
-//	{
-//		e=0;
-//	}
+	/*if(-0.00001<e<0.00001)
+	{
+		e=0;
+	}*/
 	
 	P=Kp*e;
 	I=Last_I+Ki*e;
@@ -176,6 +176,10 @@ int16_t UpdatePIDRight(float TargetSpeed, float CurrentSpeed)
 //	{
 //		u=0;
 //	}
+	if((u<10)&(u>-10))
+	{
+		u=0;
+	}
 	
 	return(u);
 }

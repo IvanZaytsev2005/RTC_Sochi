@@ -68,7 +68,7 @@ DMA_HandleTypeDef hdma_usart6_rx;
 /* USER CODE BEGIN PV */
 
 uint8_t RxBuf [32];
-uint8_t TxBuf[50];
+uint8_t TxBuf[700];
 uint8_t flag;
 uint8_t CountIn;
 int32_t CountR;
@@ -82,6 +82,9 @@ float SpeedRightMS;
 
 float TargetSpeedLeftMS;
 float TargetSpeedRightMS;
+
+float TargetSpeedMS;//speed of centre of mass
+float TargetAngSpeedRad;//angular speed
 
 uint32_t Time1;
 uint32_t Time2;
@@ -211,8 +214,8 @@ int main(void)
 		if((flag&(1<<StartCulcSpeed))!=0)
 		{
 			SpeedCulcTick();
-			uint16_t S=OutPlot(SpeedLeftMS, SpeedRightMS, TxBuf);
-			HAL_UART_Transmit_DMA(&huart6,TxBuf,S);
+		/*	uint16_t S=OutPlot(SpeedLeftMS, SpeedRightMS, TxBuf);
+			HAL_UART_Transmit_DMA(&huart6,TxBuf,S);*/
 			flag&=~(1<<StartCulcSpeed);
 		}
 	
@@ -363,12 +366,12 @@ static void MX_TIM3_Init(void)
 
   /* USER CODE END TIM3_Init 1 */
   htim3.Instance = TIM3;
-  htim3.Init.Prescaler = 8000;
+  htim3.Init.Prescaler = 50;
   htim3.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim3.Init.Period = 65535;
+  htim3.Init.Period = 1000;
   htim3.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim3.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
-  if (HAL_TIM_OC_Init(&htim3) != HAL_OK)
+  if (HAL_TIM_PWM_Init(&htim3) != HAL_OK)
   {
     Error_Handler();
   }
@@ -378,17 +381,30 @@ static void MX_TIM3_Init(void)
   {
     Error_Handler();
   }
-  sConfigOC.OCMode = TIM_OCMODE_TIMING;
+  sConfigOC.OCMode = TIM_OCMODE_PWM1;
   sConfigOC.Pulse = 0;
   sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
   sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
-  if (HAL_TIM_OC_ConfigChannel(&htim3, &sConfigOC, TIM_CHANNEL_1) != HAL_OK)
+  if (HAL_TIM_PWM_ConfigChannel(&htim3, &sConfigOC, TIM_CHANNEL_1) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  if (HAL_TIM_PWM_ConfigChannel(&htim3, &sConfigOC, TIM_CHANNEL_2) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  if (HAL_TIM_PWM_ConfigChannel(&htim3, &sConfigOC, TIM_CHANNEL_3) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  if (HAL_TIM_PWM_ConfigChannel(&htim3, &sConfigOC, TIM_CHANNEL_4) != HAL_OK)
   {
     Error_Handler();
   }
   /* USER CODE BEGIN TIM3_Init 2 */
 
   /* USER CODE END TIM3_Init 2 */
+  HAL_TIM_MspPostInit(&htim3);
 
 }
 

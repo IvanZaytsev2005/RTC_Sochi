@@ -225,10 +225,13 @@ void SysTick_Handler(void)
 	{
 		flag|=(1<<StartCulcSpeed);
 	}
+	
+	#ifdef PidVel
 	if((Count%PidTimeMs)==0)
 	{
 		flag|=(1<<StartPidUpdate);
 	}
+	#endif
 	if((Count%500)==0)
 	{
 		HAL_GPIO_TogglePin(Led_GPIO_Port,Led_Pin);

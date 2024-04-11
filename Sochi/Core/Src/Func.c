@@ -18,7 +18,7 @@ extern UART_HandleTypeDef huart1;
 extern int32_t CountR;
 extern int32_t CountL;
 
-extern uint8_t TxBuf[50];
+extern uint8_t TxBuf[700];
 
 extern int32_t SpeedTickR;
 extern int32_t SpeedTickL;
@@ -33,6 +33,9 @@ extern float SpeedRightMS;
 
 extern float TargetSpeedLeftMS;
 extern float TargetSpeedRightMS;
+
+extern float TargetSpeedMS;
+extern float TargetAngSpeedRad;
 
 extern float Kp;
 extern float Kd;
@@ -84,10 +87,16 @@ void StartState()
 	TIM10->CCR1=1;
 	HAL_TIM_PWM_Start_IT(&htim10,TIM_CHANNEL_1);
 	TIM10->DIER|=1;
-	HAL_TIM_IC_Start_IT(&htim3, TIM_CHANNEL_1);
-	HAL_TIM_IC_Start_IT(&htim3, TIM_CHANNEL_2);
-	HAL_TIM_IC_Start_IT(&htim3, TIM_CHANNEL_3);
-	HAL_TIM_IC_Start_IT(&htim3, TIM_CHANNEL_4);
+	
+	//LED INIT
+	TIM3->CCR1=0;
+	TIM3->CCR2=1000;
+	TIM3->CCR3=0;
+	TIM3->CCR4=0;
+	HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_1);
+	HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_2);
+	HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_3);
+	HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_4);
 	
 	//Servo start pwm
 	
@@ -115,9 +124,9 @@ void StartState()
 	ServoDeg[3]=ZeroStateServo4;
 	ServoDeg[4]=ZeroStateServo5;
 	#ifdef PidVel
-	Kp = 1200;
-	Kd = 500;
-	Ki = 300;
+	Kp = 2000;
+	Kd = 100;
+	Ki = 500;
 	
 	TargetSpeedRightMS=0.05;
 	TargetSpeedRightMS=0;
@@ -285,10 +294,15 @@ void Update()
 	
 	
 	uint16_t S;
-	
+	float AngL;
+	float AngR;
 	switch(RxBuf[0])
 	{
-		case 'O':
+		case 'H':
+			S=HelpOut(TxBuf);
+			HAL_UART_Transmit_DMA(&huart1,TxBuf,S);
+		break;
+		case 'O'://set PWM
 			setMotorSpeeds(datar, datal);
 			TransmitOK();
 		break;
@@ -296,15 +310,21 @@ void Update()
 			S=OutEnc(CountL, CountR, TxBuf);
 			HAL_UART_Transmit_DMA(&huart1,TxBuf,S);
 		break;
-		case 'D':
+		case 'D'://get distance mm
 			S=OutDistance(DistLeftM,DistRightM,TxBuf);
 			HAL_UART_Transmit_DMA(&huart1,TxBuf,S);
 		break;
-		case 'V':
+		case 'V'://get velocity mm/s
 			S=OutDistance(SpeedLeftMS,SpeedRightMS,TxBuf);
 			HAL_UART_Transmit_DMA(&huart1,TxBuf,S);
 		break;
-		case 'R':// reset encoders
+		case 'R'://get angle radians
+			AngL = (DistLeftM*2)/0.105;
+			AngR = (DistRightM*2)/0.105;
+			S=OutDistance(AngL,AngR,TxBuf);
+			HAL_UART_Transmit_DMA(&huart1,TxBuf,S);
+		break;
+		case 'r':// reset encoders
 			TIM2->CNT=0;
 			TIM5->CNT=0;
 			CountR=0;
@@ -312,32 +332,67 @@ void Update()
 			TransmitOK();
 		break;
 		#ifdef PidVel
-		case 'M':
+		case 'M'://set velocity motors mm/s
+			if(datal>=340)
+			{
+				datal=340;
+			}
+			if(datal<=-340)
+			{
+				datal=-340;
+			}
 			TargetSpeedLeftMS = (float)datal/1000;
 			TargetSpeedRightMS = (float)datar/1000;
 			TransmitOK();
 		break;
-		case 'L':
+/*		case 't'://timer for 0.1 m/s
 			TargetSpeedLeftMS = 0.1;
 			TargetSpeedRightMS = 0.1;
 			Servo5AngleRaw=datal;
 			flag|=(1<<StartMovServo5);
 			TransmitOK();
+		break;*/
+		case 'G'://set velocity and angular velocity for robot mm/s, rad*1000/s
+			if(datal>=340)
+			{
+				datal=340;
+			}
+			if(datal<=-340)
+			{
+				datal=-340;
+			}
+			
+			if(datar>=1446)
+			{
+				datar=1446;
+			}
+			if(datar<=-1446)
+			{
+				datar=-1446;
+			}
+			
+			TargetSpeedMS=(float)datal/1000;
+			TargetAngSpeedRad=(float)datar/1000;
+			TargetSpeedLeftMS = TargetSpeedMS+TargetAngSpeedRad*DistMM/2;
+			TargetSpeedRightMS = TargetSpeedMS-TargetAngSpeedRad*DistMM/2;
+			/*Servo5AngleRaw=1000;
+			flag|=(1<<StartMovServo5);*/
+			TransmitOK();
 		break;
 		#endif
-		case 'p':
+		case 'p'://set P const for PID
 			Kp=datal;
 			TransmitOK();
 		break;
-		case 'i':
+		case 'i'://set I const for PID
 			Ki=datal;
 			TransmitOK();
 		break;
-		case 'd':
+		case 'd'://set D const for PID
 			Kd=datal;
 			TransmitOK();
 		break;
-		case 'S':
+		case 'S':// something for servo........
 			switch(datal)
 			{
 				case 1:
@@ -372,13 +427,13 @@ void Update()
 			ServoDeg[datal-1]=(uint16_t)(datar);
 			TransmitOK();
 		break;
-		case 'T':
+		case 'T'://strannaya serva
 			S=sprintf(TxBuf,"%d",ServoDeg[((uint32_t)(datal-1))]);
 		TxBuf[S]='\r';
 			HAL_UART_Transmit_DMA(&huart1,TxBuf,S+1);
 		break;
 		#ifdef SettingMan
-		case 'J':
+		case 'J'://opyat ta serva
 			switch(datal)
 			{
 				case 0:
@@ -473,7 +528,7 @@ uint16_t OutEnc(int32_t data1, int32_t data2, uint8_t *Buf)
 	Buf++;
 	uint8_t D=sprintf(Buf,"%d",data2);
 	Buf=Buf+D;
-	*Buf='\r';
+	*Buf='_';
 	return(2+S+D);
 }
 
@@ -485,7 +540,7 @@ uint16_t OutDistance(float data1, float data2, uint8_t *Buf)
 	Buf++;
 	uint8_t D=sprintf(Buf,"%f",data2);
 	Buf=Buf+D;
-	*Buf='\r';
+	*Buf='_';
 	return(2+S+D);
 }
 
@@ -509,7 +564,7 @@ void TransmitOK()
 	TxBuf[4]='I';
 	TxBuf[5]='C';
 	
-	TxBuf[6]='\r';
+	TxBuf[6]='_';
 	HAL_UART_Transmit_DMA(&huart1,TxBuf,7);
 }
 
@@ -550,3 +605,23 @@ void setMotorSpeeds(int16_t VelL, int16_t VelR)
 		}
 	}
 }
+
+uint16_t HelpOut(uint8_t *Buf)
+{
+	uint16_t N;
+	N=sprintf(Buf,"%s%c%s%c%s%c%s%c%s%c%s%c%s%c%s%c%s%c%s%c%s%c",
+									"{O l r_} - set PWM for motor -> Ok", 13
+								,"{E_} - get encoder data->{l r}",13
+								,"{D_} - get distance for wheels, mm -> {l r}",13
+								,"{V_} - get velocity for wheels, m/s -> {l r}",13
+								,"{R_} - get angle rotation of wheels, radians -> {l r}",13
+								,"{r_} - reset encoders -> Ok",13
+								,"{M l r_} - get velocity for wheels, mm/s -> Ok",13
+								,"{G l r_} - set velocity and angular velocity for robot mm/s, rad*1000/s -> Ok",13
+								,"{p x_} - set P const for PID -> Ok",13
+								,"{i x_} - set I const for PID -> Ok",13
+								,"{d x_} - set D const for PID -> Ok",13
+	);
+	return(N);
+}
+	

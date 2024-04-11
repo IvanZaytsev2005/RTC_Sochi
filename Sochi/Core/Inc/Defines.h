@@ -26,14 +26,18 @@
 
 #define MinMotorPWM 100
 
+#define DistMM 0.235
+#define DiametrMM 105
+#define DiametrM 0.105
+
 #define SpeedServo5Right 1390
 #define SpeedServo5Left 1480
 #define SpeedServo5Stop 0
 
 #define Servo5TestAngleRaw 1000//ms
 
-#define TickPerMetrLeft 3745
-#define TickPerMetrRight 4060
+#define TickPerMetrLeft 3733
+#define TickPerMetrRight 4064
 
 #define SettingMan 1
 
