@@ -34,7 +34,31 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
+#ifdef Music
+uint16_t frecs[128]={
+	 Bm1, 0xFFFF, Bm1, 0xFFFF, Bm1, 0xFFFF, Bm1, 0xFFFF
+	,Bm1, B1, Em2, Bm1, 0xFFFF, Bm1, 0xFFFF, Bm1, 0xFFFF
+	,Bm1, B1, Em2, Bm1, 0xFFFF, Bm1, 0xFFFF
+	,Bm1, B1, Em2, Bm1, 0xFFFF, Bm1, 0xFFFF
+	
+	,Bm1, B1, Em2, Bm1, 0xFFFF, Bm1, 0xFFFF
+	,Bm1, B1, Em2, F2, 0xFFFF, F2, 0xFFFF
+	,Am2, Fd2, F2, Em2,0xFFFF, Em2, 0xFFFF
+	,Am2, Fd2, F2, Em2,0xFFFF, Em2, 0xFFFF
+};
 
+float tacts[128]={
+	 0.1875, 0.0625, 0.1875, 0.0625, 0.1875, 0.0625, 0.1875, 0.0625
+	,0.1875, 0.1875, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125
+	,0.1875, 0.1875, 0.125, 0.125, 0.125, 0.125, 0.125
+	,0.1875, 0.1875, 0.125, 0.125, 0.125, 0.125, 0.125
+	
+	,0.1875, 0.1875, 0.125, 0.125, 0.125, 0.125, 0.125
+	,0.1875, 0.1875, 0.125, 0.125, 0.125, 0.125, 0.125
+	,0.1875, 0.1875, 0.125, 0.125, 0.125, 0.125, 0.125
+	,0.1875, 0.1875, 0.125, 0.125, 0.125, 0.125, 0.125
+};
+#endif
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -76,6 +100,7 @@ extern uint8_t CountSpace;
 /* USER CODE END 0 */
 
 /* External variables --------------------------------------------------------*/
+extern TIM_HandleTypeDef htim1;
 extern TIM_HandleTypeDef htim2;
 extern TIM_HandleTypeDef htim5;
 extern TIM_HandleTypeDef htim10;
@@ -213,6 +238,26 @@ void PendSV_Handler(void)
 void SysTick_Handler(void)
 {
   /* USER CODE BEGIN SysTick_IRQn 0 */
+	#ifdef Music
+	static uint16_t count;
+	static uint16_t next_time;
+	static uint8_t pointer;
+	static uint16_t countforbas;
+	if(count>=next_time)
+	{
+		next_time=tact*tacts[pointer];
+		TIM9->ARR=frecs[pointer];
+	//	TIM9->CCR1=frecs[pointer]/3;
+	//	TIM9->CCR2=frecs[pointer]/3;
+		count=0;
+		pointer ++;
+		if(pointer>=64)
+		{
+			pointer=8;
+		}
+	}
+	count++;
+	#endif
 	static uint32_t Count;
 	static uint32_t CountServo5;
 	
@@ -232,6 +277,15 @@ void SysTick_Handler(void)
 		flag|=(1<<StartPidUpdate);
 	}
 	#endif
+	
+	#ifdef present
+	if((Count%TimeSwitch)==0)
+	{
+		flag|=(1<<SwitchesColor);
+	}
+	
+	#endif
+	
 	if((Count%500)==0)
 	{
 		HAL_GPIO_TogglePin(Led_GPIO_Port,Led_Pin);
@@ -291,6 +345,7 @@ void TIM1_UP_TIM10_IRQHandler(void)
 		TIM3->CNT=0;
 	}
   /* USER CODE END TIM1_UP_TIM10_IRQn 0 */
+  HAL_TIM_IRQHandler(&htim1);
   HAL_TIM_IRQHandler(&htim10);
   /* USER CODE BEGIN TIM1_UP_TIM10_IRQn 1 */
 
@@ -309,6 +364,7 @@ void TIM1_TRG_COM_TIM11_IRQHandler(void)
 		HAL_GPIO_WritePin(Servo5_GPIO_Port,Servo5_Pin,1);
 	}
   /* USER CODE END TIM1_TRG_COM_TIM11_IRQn 0 */
+  HAL_TIM_IRQHandler(&htim1);
   HAL_TIM_IRQHandler(&htim11);
   /* USER CODE BEGIN TIM1_TRG_COM_TIM11_IRQn 1 */
 

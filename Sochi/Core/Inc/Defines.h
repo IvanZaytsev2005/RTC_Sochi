@@ -53,3 +53,28 @@
 	#define PidTimeMs 100
 	#define NormDeltaMM 5 //error no moving
 #endif
+
+#define present
+//#define Music
+
+#ifdef present
+	#define TimeSwitch 1500
+	#define SwitchesColor 7
+#endif
+
+#ifdef Music
+#define tact 1920
+#define Cd2 3030
+#define Gd2 2022
+#define Fd2 2270
+#define E2 2548
+#define B1 3401
+#define A2 1909
+#define Dd2 2699
+
+#define Bm1 3603
+#define B1 3401
+#define Em2 2699
+#define F2 2405
+#define Am2 2022
+#endif

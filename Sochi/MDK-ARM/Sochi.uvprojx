@@ -545,4 +545,13 @@
     <files/>
   </RTE>
 
+  <LayerInfo>
+    <Layers>
+      <Layer>
+        <LayName>Sochi</LayName>
+        <LayPrjMark>1</LayPrjMark>
+      </Layer>
+    </Layers>
+  </LayerInfo>
+
 </Project>

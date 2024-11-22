@@ -81,6 +81,8 @@ void Error_Handler(void);
 #define EN_L_A_GPIO_Port GPIOB
 #define EN_L_B_Pin GPIO_PIN_13
 #define EN_L_B_GPIO_Port GPIOB
+#define Light_Pin GPIO_PIN_15
+#define Light_GPIO_Port GPIOA
 #define Enc_R_B_Pin GPIO_PIN_3
 #define Enc_R_B_GPIO_Port GPIOB
 #define Servo5_Pin GPIO_PIN_4

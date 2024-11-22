@@ -5,6 +5,7 @@
 extern uint8_t RxBuf[32];
 extern uint8_t flag;
 extern uint8_t CountIn;
+extern TIM_HandleTypeDef htim1;
 extern TIM_HandleTypeDef htim9;
 extern TIM_HandleTypeDef htim3;
 extern TIM_HandleTypeDef htim2;
@@ -63,13 +64,26 @@ extern	uint32_t CountTest;
 
 void StartState()
 {
+	#ifdef Music
+	TIM9->CCR1=700;
+	TIM9->CCR2=700;
+	TIM9->ARR=3603;
+	l_motor_stop();
+	r_motor_stop();
+	HAL_TIM_PWM_Start(&htim9,TIM_CHANNEL_1);
+	HAL_TIM_PWM_Start(&htim9,TIM_CHANNEL_2);
+	#else
 	l_motor_stop();
 	r_motor_stop();
 	TIM9->CCR1=MIN_PWM;
 	HAL_TIM_PWM_Start(&htim9,TIM_CHANNEL_1);
 	TIM9->CCR2=MIN_PWM;
 	HAL_TIM_PWM_Start(&htim9,TIM_CHANNEL_2);
-	
+	#endif
+	//rotation lidar
+	TIM1->CCR1=0;
+	HAL_TIM_PWM_Start(&htim1,TIM_CHANNEL_1);
+	//HAL_GPIO_WritePin(LIdarRotation_GPIO_Port,LIdarRotation_Pin,1);
 	
 	//encoder
 	CountR=0;
@@ -88,16 +102,17 @@ void StartState()
 	HAL_TIM_PWM_Start_IT(&htim10,TIM_CHANNEL_1);
 	TIM10->DIER|=1;
 	
+	#ifdef present
 	//LED INIT
-	TIM3->CCR1=0;
-	TIM3->CCR2=1000;
-	TIM3->CCR3=0;
+	TIM3->CCR1=255;
+	TIM3->CCR2=0;
+	TIM3->CCR3=255;
 	TIM3->CCR4=0;
 	HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_1);
 	HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_2);
 	HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_3);
 	HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_4);
-	
+	#endif
 	//Servo start pwm
 	
 	TIM11->CCR1=1500;
@@ -131,48 +146,76 @@ void StartState()
 	TargetSpeedRightMS=0.05;
 	TargetSpeedRightMS=0;
 	#endif
+	
+	HAL_GPIO_WritePin(Light_GPIO_Port,Light_Pin,1);
 }
 
 void r_motor_forv(uint16_t Velocity)
 {
+	#ifdef Music
+	TIM9->CCR1=Velocity*TIM9->ARR/1000;
+	#else
 	TIM9->CCR1=Velocity;
+	#endif
 	HAL_GPIO_WritePin(EN_R_A_GPIO_Port,EN_R_A_Pin,1);
 	HAL_GPIO_WritePin(EN_R_B_GPIO_Port,EN_R_B_Pin,0);
 }
 
 void r_motor_back(uint16_t Velocity)
 {
+	#ifdef Music
+	TIM9->CCR1=Velocity*TIM9->ARR/1000;
+	#else
 	TIM9->CCR1=Velocity;
+	#endif
 	HAL_GPIO_WritePin(EN_R_A_GPIO_Port,EN_R_A_Pin,0);
 	HAL_GPIO_WritePin(EN_R_B_GPIO_Port,EN_R_B_Pin,1);
 }
 
 void r_motor_stop()
 {
+	#ifdef Music
+	TIM9->CCR1=MIN_PWM*TIM9->ARR/1000;
+	#else
 //	TIM9->CCR1=Velocity;
-	HAL_GPIO_WritePin(EN_R_A_GPIO_Port,EN_R_A_Pin,1);
+		HAL_GPIO_WritePin(EN_R_A_GPIO_Port,EN_R_A_Pin,1);
 	HAL_GPIO_WritePin(EN_R_B_GPIO_Port,EN_R_B_Pin,1);
+	#endif
+
 }
 
 void l_motor_forv(uint16_t Velocity)
 {
+	#ifdef Music
+	TIM9->CCR2=Velocity*TIM9->ARR/1000;
+	#else
 	TIM9->CCR2=Velocity;
+	#endif
 	HAL_GPIO_WritePin(EN_L_A_GPIO_Port,EN_L_A_Pin,1);
 	HAL_GPIO_WritePin(EN_L_B_GPIO_Port,EN_L_B_Pin,0);
 }
 
 void l_motor_back(uint16_t Velocity)
 {
+	#ifdef Music
+	TIM9->CCR2=Velocity*TIM9->ARR/1000;
+	#else
 	TIM9->CCR2=Velocity;
+	#endif
 	HAL_GPIO_WritePin(EN_L_A_GPIO_Port,EN_L_A_Pin,0);
 	HAL_GPIO_WritePin(EN_L_B_GPIO_Port,EN_L_B_Pin,1);
 }
 
 void l_motor_stop()
 {
+	#ifdef Music
+	TIM9->CCR2=MIN_PWM*TIM9->ARR/1000;
+	#else
 //	TIM9->CCR1=Velocity;
-	HAL_GPIO_WritePin(EN_L_A_GPIO_Port,EN_L_A_Pin,1);
+		HAL_GPIO_WritePin(EN_L_A_GPIO_Port,EN_L_A_Pin,1);
 	HAL_GPIO_WritePin(EN_L_B_GPIO_Port,EN_L_B_Pin,1);
+	#endif
+
 }
 
 void ServoWrite5(uint16_t Angle)
@@ -298,6 +341,10 @@ void Update()
 	float AngR;
 	switch(RxBuf[0])
 	{
+		case 'B':S=HelpOut(TxBuf);
+			HAL_UART_Transmit(&huart1,TxBuf,S,500);
+			NVIC_SystemReset();
+		break;
 		case 'H':
 			S=HelpOut(TxBuf);
 			HAL_UART_Transmit_DMA(&huart1,TxBuf,S);
@@ -431,6 +478,12 @@ void Update()
 			S=sprintf(TxBuf,"%d",ServoDeg[((uint32_t)(datal-1))]);
 		TxBuf[S]='\r';
 			HAL_UART_Transmit_DMA(&huart1,TxBuf,S+1);
+		break;
+		case 'W':
+			TIM1->CCR1=datal;
+		break;
+		case 'L':
+			HAL_GPIO_WritePin(Light_GPIO_Port,Light_Pin,datal);
 		break;
 		#ifdef SettingMan
 		case 'J'://opyat ta serva
@@ -616,12 +669,25 @@ uint16_t HelpOut(uint8_t *Buf)
 								,"{V_} - get velocity for wheels, m/s -> {l r}",13
 								,"{R_} - get angle rotation of wheels, radians -> {l r}",13
 								,"{r_} - reset encoders -> Ok",13
-								,"{M l r_} - get velocity for wheels, mm/s -> Ok",13
+								,"{M l r_} - set velocity for wheels, mm/s -> Ok",13
 								,"{G l r_} - set velocity and angular velocity for robot mm/s, rad*1000/s -> Ok",13
 								,"{p x_} - set P const for PID -> Ok",13
 								,"{i x_} - set I const for PID -> Ok",13
 								,"{d x_} - set D const for PID -> Ok",13
+								,"{L 0_} - Led Off -> Ok",13
+								,"{L 1_} - Led On -> Ok",13
 	);
 	return(N);
 }
 	
+
+#ifdef present
+
+void ColorOut(uint32_t Color)
+{
+	TIM3->CCR1=255-((Color>>16)&0xFF);
+	TIM3->CCR3=255-((Color>>8)&0xFF);
+	TIM3->CCR4=255-((Color)&0xFF);
+}
+
+#endif

@@ -23,3 +23,5 @@ uint16_t OutDistance(float data1, float data2, uint8_t *Buf);
 void TransmitOK();
 void setMotorSpeeds(int16_t VelL, int16_t VelR);
 uint16_t HelpOut(uint8_t *Buf);
+
+void ColorOut(uint32_t Color);

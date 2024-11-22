@@ -22,82 +22,13 @@ Dialog DLL:      TCM.DLL V1.48.0.0
  
 <h2>Project:</h2>
 C:\STM32\Projects\RTC_Sochi\Sochi\MDK-ARM\Sochi.uvprojx
-Project File Date:  04/11/2024
+Project File Date:  09/10/2024
 
 <h2>Output:</h2>
 *** Using Compiler 'V5.06 update 7 (build 960)', folder: 'C:\Keil_v5\ARM\ARMCC\Bin'
 Build target 'Sochi'
 Note: source file '../Core/Src/system_stm32f4xx.c' - object file renamed from 'Sochi\system_stm32f4xx.o' to 'Sochi\system_stm32f4xx_1.o'.
-compiling Func.c...
-../Core/Inc/Func.h(6): warning:  #1295-D: Deprecated declaration r_motor_stop - give arg types
-  void r_motor_stop();
-../Core/Inc/Func.h(9): warning:  #1295-D: Deprecated declaration l_motor_stop - give arg types
-  void l_motor_stop();
-../Core/Inc/Func.h(10): warning:  #1295-D: Deprecated declaration StartState - give arg types
-  void StartState();
-../Core/Inc/Func.h(11): warning:  #1295-D: Deprecated declaration Update - give arg types
-  void Update();
-../Core/Inc/Func.h(20): warning:  #1295-D: Deprecated declaration SpeedCulcTick - give arg types
-  void SpeedCulcTick();
-../Core/Inc/Func.h(23): warning:  #1295-D: Deprecated declaration TransmitOK - give arg types
-  void TransmitOK();
-../Core/Inc/Func.h(25): warning:  #1-D: last line of file ends without a newline
-  uint16_t HelpOut(uint8_t *Buf);
-../Core/Inc/Defines.h(55): warning:  #1-D: last line of file ends without a newline
-  #endif
-../Core/Inc/Defines.h(55): warning:  #1-D: last line of file ends without a newline
-  #endif
-..\Core\Src\Func.c(139): warning:  #188-D: enumerated type mixed with another type
-  	HAL_GPIO_WritePin(EN_R_A_GPIO_Port,EN_R_A_Pin,1);
-..\Core\Src\Func.c(140): warning:  #188-D: enumerated type mixed with another type
-  	HAL_GPIO_WritePin(EN_R_B_GPIO_Port,EN_R_B_Pin,0);
-..\Core\Src\Func.c(146): warning:  #188-D: enumerated type mixed with another type
-  	HAL_GPIO_WritePin(EN_R_A_GPIO_Port,EN_R_A_Pin,0);
-..\Core\Src\Func.c(147): warning:  #188-D: enumerated type mixed with another type
-  	HAL_GPIO_WritePin(EN_R_B_GPIO_Port,EN_R_B_Pin,1);
-..\Core\Src\Func.c(153): warning:  #188-D: enumerated type mixed with another type
-  	HAL_GPIO_WritePin(EN_R_A_GPIO_Port,EN_R_A_Pin,1);
-..\Core\Src\Func.c(154): warning:  #188-D: enumerated type mixed with another type
-  	HAL_GPIO_WritePin(EN_R_B_GPIO_Port,EN_R_B_Pin,1);
-..\Core\Src\Func.c(160): warning:  #188-D: enumerated type mixed with another type
-  	HAL_GPIO_WritePin(EN_L_A_GPIO_Port,EN_L_A_Pin,1);
-..\Core\Src\Func.c(161): warning:  #188-D: enumerated type mixed with another type
-  	HAL_GPIO_WritePin(EN_L_B_GPIO_Port,EN_L_B_Pin,0);
-..\Core\Src\Func.c(167): warning:  #188-D: enumerated type mixed with another type
-  	HAL_GPIO_WritePin(EN_L_A_GPIO_Port,EN_L_A_Pin,0);
-..\Core\Src\Func.c(168): warning:  #188-D: enumerated type mixed with another type
-  	HAL_GPIO_WritePin(EN_L_B_GPIO_Port,EN_L_B_Pin,1);
-..\Core\Src\Func.c(174): warning:  #188-D: enumerated type mixed with another type
-  	HAL_GPIO_WritePin(EN_L_A_GPIO_Port,EN_L_A_Pin,1);
-..\Core\Src\Func.c(175): warning:  #188-D: enumerated type mixed with another type
-  	HAL_GPIO_WritePin(EN_L_B_GPIO_Port,EN_L_B_Pin,1);
-..\Core\Src\Func.c(322): warning:  #1035-D: single-precision operand implicitly converted to double-precision
-  			AngL = (DistLeftM*2)/0.105;
-..\Core\Src\Func.c(323): warning:  #1035-D: single-precision operand implicitly converted to double-precision
-  			AngR = (DistRightM*2)/0.105;
-..\Core\Src\Func.c(376): warning:  #1035-D: single-precision operand implicitly converted to double-precision
-  			TargetSpeedLeftMS = TargetSpeedMS+TargetAngSpeedRad*DistMM/2;
-..\Core\Src\Func.c(377): warning:  #1035-D: single-precision operand implicitly converted to double-precision
-  			TargetSpeedRightMS = TargetSpeedMS-TargetAngSpeedRad*DistMM/2;
-..\Core\Src\Func.c(431): warning:  #223-D: function "sprintf" declared implicitly
-  			S=sprintf(TxBuf,"%d",ServoDeg[((uint32_t)(datal-1))]);
-..\Core\Src\Func.c(509): warning:  #223-D: function "sprintf" declared implicitly
-  	uint8_t S=sprintf(Buf,"%f",data1);
-..\Core\Src\Func.c(525): warning:  #223-D: function "sprintf" declared implicitly
-  	uint8_t S=sprintf(Buf,"%d",data1);
-..\Core\Src\Func.c(537): warning:  #223-D: function "sprintf" declared implicitly
-  	uint8_t S=sprintf(Buf,"%f",data1);
-..\Core\Src\Func.c(573): warning:  #223-D: function "abs" declared implicitly
-  	if((abs(VelL)>MinMotorPWM)|(abs(VelR)>MinMotorPWM))
-..\Core\Src\Func.c(612): warning:  #223-D: function "sprintf" declared implicitly
-  	N=sprintf(Buf,"%s%c%s%c%s%c%s%c%s%c%s%c%s%c%s%c%s%c%s%c%s%c",
-..\Core\Src\Func.c(627): warning:  #1-D: last line of file ends without a newline
-  	
-..\Core\Src\Func.c: 32 warnings, 0 errors
-linking...
-Program Size: Code=21170 RO-data=730 RW-data=140 ZI-data=3404  
-FromELF: creating hex file...
-"Sochi\Sochi.axf" - 0 Error(s), 32 Warning(s).
+"Sochi\Sochi.axf" - 0 Error(s), 0 Warning(s).
 
 <h2>Software Packages used:</h2>
 

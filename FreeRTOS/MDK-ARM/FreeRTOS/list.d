@@ -1,0 +1,12 @@
+freertos\list.o: ..\Core\FreeRTOS\list.c
+freertos\list.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdlib.h
+freertos\list.o: ..\Core\FreeRTOS\include\FreeRTOS.h
+freertos\list.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stddef.h
+freertos\list.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
+freertos\list.o: ../Core/Inc/FreeRTOSConfig.h
+freertos\list.o: ..\Core\FreeRTOS\include\projdefs.h
+freertos\list.o: ..\Core\FreeRTOS\include\portable.h
+freertos\list.o: ..\Core\FreeRTOS\include\deprecated_definitions.h
+freertos\list.o: ..\Core\FreeRTOS\portable\RVDS\ARM_CM4_MPU\portmacro.h
+freertos\list.o: ..\Core\FreeRTOS\include\mpu_wrappers.h
+freertos\list.o: ..\Core\FreeRTOS\include\list.h
